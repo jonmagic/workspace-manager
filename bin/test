@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'shellwords'
+
+command = 'ruby -I test -r coverage_helper -e "Dir.glob(\"test/**/*_test.rb\").sort.each { |f| require_relative f }"'
+exec(*Shellwords.split(command))
