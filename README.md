@@ -37,11 +37,16 @@ This is a CLI I'm building to help me manage [VS Code workspaces](https://code.v
 	```bash
 	wm open --recent 1
 	```
-4. **Attach more repositories** – add extra worktrees or bring in standalone folders:
+4. **Rotate to a different branch** – switch all repos in a workspace to work on a different branch:
+	```bash
+	wm rotate --session slug--repo-one --branch bugfix/issue-123 --create --base main
+	```
+	This keeps the same workspace session but rotates all repositories to the new branch. Perfect for serial work where you want to maintain one long-lived workspace while switching between different branches over time.
+5. **Attach more repositories** – add extra worktrees or bring in standalone folders:
 	```bash
 	wm extend slug--repo-one --folder brain repo-three
 	```
-5. **Clean up when finished** – archive manifests/workspaces and remove worktrees:
+6. **Clean up when finished** – archive manifests/workspaces and remove worktrees:
 	```bash
 	wm prune slug--repo-one
 	```
@@ -57,6 +62,7 @@ This is a CLI I'm building to help me manage [VS Code workspaces](https://code.v
 | `init` | Create a workspace for one or more repositories and prep matching worktrees. | `--feature NAME` *(required)*, `--primary NAME`, `--base main` or `repo:branch`, `--folder TOKEN` *(repeatable)*, `--notes TEXT`, `--checkout-existing`, `--dry-run`, `--no-open`, `--verbose` |
 | `list` | Show recent sessions with optional filters and JSON output. | `--limit N`, `--active`, `--json`, `--reverse` |
 | `open` | Resolve a session and launch VS Code or just print the workspace path. | `--session ID`, `--recent N`, `--print`, `--no-open` |
+| `rotate` | Rotate workspace to a different branch across all repos. | `--session ID` *(required)*, `--branch NAME` *(required)*, `--create`, `--base BRANCH`, `--dry-run`, `--no-open`, `--verbose` |
 | `extend` | Attach additional repositories or folders to a session and create new worktrees as needed. | `--session ID`, repeatable `--base` overrides, `--folder TOKEN`, `--checkout-existing`, `--dry-run`, `--no-open`, `--verbose` |
 | `prune` | Remove worktrees and archive session artifacts. | `--session ID`, `--dry-run` |
 | `remove` | Permanently delete a workspace session, worktrees, and all traces. | `--session ID`, `--dry-run` |
@@ -102,6 +108,28 @@ Environment variables still override the same settings if needed:
 If a required value is missing, commands will instruct you to run `wm setup` again.
 
 Use `--dry-run` with any mutating command to see what would happen without touching the filesystem. Combine `--verbose` for detailed logging, including shell commands.
+
+### Worktrunk integration
+
+workspace-manager can optionally delegate Git worktree operations to [Worktrunk](https://github.com/Danie1/worktrunk) (`wt`) when it's installed and available in your `PATH`. This provides enhanced worktree management capabilities while maintaining full backward compatibility.
+
+**Benefits of using Worktrunk:**
+- Simplified branch switching with `wt switch` / `wt switch --create`
+- Automatic worktree discovery and path resolution
+- Cleaner branch lifecycle management with `wt remove`
+
+**Fallback behavior:**
+If `wt` is not installed, workspace-manager automatically falls back to standard `git worktree` commands. All functionality works identically whether Worktrunk is present or not.
+
+**To use Worktrunk:**
+1. Install Worktrunk following the instructions at https://github.com/Danie1/worktrunk
+2. Ensure `wt` is in your `PATH`
+3. workspace-manager will automatically detect and use it
+
+Commands that benefit from Worktrunk integration:
+- `wm init` – creates initial branch worktrees
+- `wm rotate` – switches branches across all repos in a workspace
+- `wm prune` / `wm remove` – cleans up worktrees and branches
 
 ### Testing
 
