@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
-require 'shellwords'
+require 'open3'
 
 module WorkspaceManager
   module CLI
@@ -44,8 +44,9 @@ module WorkspaceManager
 
         return [] if context[:dry_run]
 
-        output = `wt -C #{repo_path.shellescape} list --format=json 2>/dev/null`
-        return [] unless $?.success?
+        require 'open3'
+        output, status = Open3.capture2('wt', '-C', repo_path, 'list', '--format=json', err: File::NULL)
+        return [] unless status.success?
 
         JSON.parse(output)
       rescue JSON::ParserError
