@@ -46,6 +46,18 @@ module WorkspaceManager
           end
         end
 
+        # Try using Worktrunk if available
+        if Worktrunk.available?(context)
+          begin
+            Output.log(context, :debug, "Using Worktrunk for #{repo}")
+            actual_path = Worktrunk.switch(context, repo_path, chosen_branch, create: !reuse_existing, base: base_branch)
+            return chosen_branch if actual_path
+          rescue Error => e
+            Output.log(context, :debug, "Worktrunk failed, falling back to git: #{e.message}")
+          end
+        end
+
+        # Fallback to git worktree commands
         if reuse_existing
           Runtime.run_cmd(context, 'git', '-C', repo_path, 'worktree', 'add', worktree_path, chosen_branch)
         else

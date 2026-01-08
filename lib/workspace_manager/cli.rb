@@ -10,6 +10,7 @@ require_relative 'cli/context'
 require_relative 'cli/helpers'
 require_relative 'cli/output'
 require_relative 'cli/runtime'
+require_relative 'cli/worktrunk'
 require_relative 'cli/repo'
 require_relative 'cli/workspace'
 require_relative 'cli/history'
@@ -21,6 +22,7 @@ require_relative 'cli/commands/open'
 require_relative 'cli/commands/prune'
 require_relative 'cli/commands/extend'
 require_relative 'cli/commands/remove'
+require_relative 'cli/commands/rotate'
 
 module WorkspaceManager
   class Error < StandardError; end
@@ -47,6 +49,7 @@ module WorkspaceManager
         prune      Remove worktrees and archive workspace session
         remove     Permanently delete a workspace session and all traces
         extend     Attach additional repositories to an existing session
+        rotate     Rotate workspace to a different branch across all repos
         setup      Interactive configuration wizard
         help       Show this message
         version    Print CLI version
@@ -153,6 +156,8 @@ module WorkspaceManager
         Commands::Remove.call(context, context[:argv])
       when 'extend'
         Commands::Extend.call(context, context[:argv])
+      when 'rotate'
+        Commands::Rotate.call(context, context[:argv])
       else
         raise(Error, "Unknown command '#{command}'. Use '#{context[:command_name]} help'.")
       end

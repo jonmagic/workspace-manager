@@ -76,6 +76,18 @@ module WorkspaceManager
             return
           end
 
+          # Try using Worktrunk if available
+          if Worktrunk.available?(context)
+            begin
+              Worktrunk.remove(context, repo_root, branch)
+              Output.log(context, :info, "Removed branch #{branch} in #{repo_name} using Worktrunk")
+              return
+            rescue WorkspaceManager::Error => e
+              Output.log(context, :warn, "Worktrunk remove failed for #{repo_name}, falling back to git: #{e.message}")
+            end
+          end
+
+          # Fallback to git commands
           begin
             Runtime.run_cmd(context, 'git', '-C', repo_root, 'worktree', 'prune')
           rescue WorkspaceManager::Error => e
