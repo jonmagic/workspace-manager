@@ -44,7 +44,6 @@ module WorkspaceManager
 
         return [] if context[:dry_run]
 
-        require 'open3'
         output, status = Open3.capture2('wt', '-C', repo_path, 'list', '--format=json', err: File::NULL)
         return [] unless status.success?
 

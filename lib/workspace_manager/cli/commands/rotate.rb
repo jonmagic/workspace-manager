@@ -122,7 +122,7 @@ module WorkspaceManager
           Workspace.write_json(context, manifest_file, manifest)
 
           Output.log(context, :success, "Session #{session_id} rotated to branch #{target_branch}")
-          Output.log(context, :info, "Worktrees: #{updated_folders.map { |f| f[:path] }.join(', ')}")
+          Output.log(context, :info, "Worktrees: #{updated_folders.map { |f| f['path'] }.join(', ')}")
 
           Workspace.launch_editor(context, workspace_file) unless context[:no_open]
         end
