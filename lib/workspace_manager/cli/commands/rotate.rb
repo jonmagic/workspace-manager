@@ -99,8 +99,13 @@ module WorkspaceManager
           end
 
           # Preserve any extra folders that aren't repos
+          # Only add folders that are not already in the repos list
+          repo_names = repos.map { |r| r['repo'] }.compact
           manifest_folders = manifest['folders'] || []
           manifest_folders.each do |folder|
+            # Skip if this folder matches a repo (by path or name)
+            next if repo_names.include?(folder['name'])
+            
             path = folder['path']
             name = folder['name']
             updated_folders << { 'path' => path, 'name' => name }

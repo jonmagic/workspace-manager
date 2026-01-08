@@ -45,12 +45,19 @@ module WorkspaceManager
 
         return [] if context[:dry_run]
 
-        output, status = Open3.capture2('wt', '-C', repo_path, 'list', '--format=json', err: File::NULL)
-        return [] unless status.success?
+        # Use a temporary capture approach
+        output = capture_wt_output(repo_path, 'list', '--format=json')
+        return [] if output.nil?
 
         JSON.parse(output)
       rescue JSON::ParserError
         []
+      end
+
+      # Capture output from wt command safely
+      def capture_wt_output(repo_path, *args)
+        output, status = Open3.capture2('wt', '-C', repo_path, *args, err: File::NULL)
+        status.success? ? output : nil
       end
 
       # Get worktree path for a specific branch
