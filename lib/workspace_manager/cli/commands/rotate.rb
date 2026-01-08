@@ -98,9 +98,6 @@ module WorkspaceManager
             }
           end
 
-          # Update workspace file folders
-          workspace_data['folders'] = updated_folders
-
           # Preserve any extra folders that aren't repos
           manifest_folders = manifest['folders'] || []
           manifest_folders.each do |folder|
@@ -109,6 +106,7 @@ module WorkspaceManager
             updated_folders << { 'path' => path, 'name' => name }
           end
 
+          # Update workspace file folders
           workspace_data['folders'] = updated_folders
 
           # Update manifest

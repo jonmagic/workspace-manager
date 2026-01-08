@@ -41,6 +41,7 @@ module WorkspaceManager
       # List worktrees and return parsed JSON
       def list_worktrees(context, repo_path)
         raise(Error, 'wt command not available') unless available?(context)
+        raise(Error, 'Invalid repository path') unless repo_path && File.directory?(repo_path)
 
         return [] if context[:dry_run]
 
