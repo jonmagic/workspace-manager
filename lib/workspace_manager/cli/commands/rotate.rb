@@ -103,6 +103,9 @@ module WorkspaceManager
           repo_names = repos.map { |r| r['repo'] }.compact
           manifest_folders = manifest['folders'] || []
           manifest_folders.each do |folder|
+            next unless folder.is_a?(Hash)
+            next unless folder['path'] && folder['name']
+            
             # Skip if this folder matches a repo (by path or name)
             next if repo_names.include?(folder['name'])
             

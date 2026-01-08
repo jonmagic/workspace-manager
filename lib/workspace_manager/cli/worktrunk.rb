@@ -38,15 +38,25 @@ module WorkspaceManager
         Runtime.run_cmd(context, 'wt', '-C', repo_path, 'remove', branch)
       end
 
+      # Validate repository path
+      def validate_repo_path(repo_path)
+        raise(Error, 'Invalid repository path') unless repo_path && !repo_path.empty?
+        raise(Error, 'Repository path does not exist') unless File.directory?(repo_path)
+        
+        # Resolve to absolute path to prevent relative path attacks
+        File.expand_path(repo_path)
+      end
+
       # List worktrees and return parsed JSON
       def list_worktrees(context, repo_path)
         raise(Error, 'wt command not available') unless available?(context)
-        raise(Error, 'Invalid repository path') unless repo_path && File.directory?(repo_path)
+        
+        validated_path = validate_repo_path(repo_path)
 
         return [] if context[:dry_run]
 
         # Use a temporary capture approach
-        output = capture_wt_output(repo_path, 'list', '--format=json')
+        output = capture_wt_output(validated_path, 'list', '--format=json')
         return [] if output.nil?
 
         JSON.parse(output)
